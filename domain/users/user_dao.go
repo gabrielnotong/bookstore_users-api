@@ -3,6 +3,7 @@ package users
 import (
 	"fmt"
 	"github.com/gabrielnotong/bookstore_users-api/errors"
+	"github.com/gabrielnotong/bookstore_users-api/formatting"
 )
 
 var (
@@ -32,6 +33,7 @@ func (u *User) Save() *errors.RestErr {
 		}
 		return errors.NewBadRequestError(fmt.Sprintf("user %d already exists", u.Id))
 	}
+	u.CreatedAt = formatting.DateNowString()
 	DB[u.Id] = u
 	return nil
 }
