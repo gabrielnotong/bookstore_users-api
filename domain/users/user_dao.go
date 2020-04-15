@@ -1,39 +1,45 @@
 package users
 
 import (
-	"fmt"
+	"github.com/gabrielnotong/bookstore_users-api/datasource/mysql/users_db"
 	"github.com/gabrielnotong/bookstore_users-api/errors"
 	"github.com/gabrielnotong/bookstore_users-api/formatting"
 )
 
 var (
-	DB = make(map[int64]*User)
+	DB = users_db.DB
 )
 
 func (u *User) Find() *errors.RestErr {
-	user := DB[u.Id]
-	if user == nil {
+	row := DB.QueryRow("SELECT * FROM users WHERE id = $1", u.Id)
+	if row == nil {
 		return errors.NewNotFoundError("user not found")
 	}
 
-	u.Id = user.Id
-	u.FirstName = user.FirstName
-	u.LastName = user.LastName
-	u.Email = user.Email
-	u.CreatedAt = user.CreatedAt
+	err := row.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Email, &u.CreatedAt)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
+	}
 
 	return nil
 }
 
 func (u *User) Save() *errors.RestErr {
-	current := DB[u.Id]
-	if current != nil {
-		if u.Email == DB[u.Id].Email {
-			return errors.NewBadRequestError(fmt.Sprintf("email %s already exists", u.Email))
-		}
-		return errors.NewBadRequestError(fmt.Sprintf("user %d already exists", u.Id))
-	}
 	u.CreatedAt = formatting.DateNowString()
-	DB[u.Id] = u
+
+	sqlStatement := `
+	INSERT INTO users (first_name, last_name, email, created_at)
+	VALUES ($1, $2, $3, $4)
+	RETURNING id`
+
+	var id int64
+
+	err := DB.QueryRow(sqlStatement, u.FirstName, u.LastName, u.Email, u.CreatedAt).Scan(&id)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
+	}
+
+	u.Id = id
+
 	return nil
 }
