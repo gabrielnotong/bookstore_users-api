@@ -1,15 +1,9 @@
 package users
 
 import (
-	"fmt"
 	"github.com/gabrielnotong/bookstore_users-api/datasource/mysql/users_db"
 	"github.com/gabrielnotong/bookstore_users-api/errors"
 	"github.com/gabrielnotong/bookstore_users-api/formatting"
-	"strings"
-)
-
-const (
-	indexUniqueEmail = "email_unique"
 )
 
 var (
@@ -17,18 +11,16 @@ var (
 )
 
 func (u *User) Find() *errors.RestErr {
-	row := DB.QueryRow("SELECT * FROM users WHERE id = $1", u.Id)
-	if row == nil {
-		return errors.NewNotFoundError(
-			fmt.Sprintf("user %d not found", u.Id),
-		)
+	stmt, err := DB.Prepare("SELECT * FROM users WHERE id = $1")
+	if err != nil {
+		return errors.ParsePostgresError(err)
 	}
 
-	err := row.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Email, &u.CreatedAt)
+	res := stmt.QueryRow(u.Id)
+
+	err = res.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Email, &u.CreatedAt)
 	if err != nil {
-		return errors.NewInternalServerError(
-			fmt.Sprintf("Error when getting a user %d: %s", u.Id, err.Error()),
-		)
+		return errors.ParsePostgresError(err)
 	}
 
 	return nil
@@ -46,12 +38,7 @@ func (u *User) Save() *errors.RestErr {
 
 	err := DB.QueryRow(sqlStatement, u.FirstName, u.LastName, u.Email, u.CreatedAt).Scan(&id)
 	if err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), indexUniqueEmail) {
-			return errors.NewBadRequestError(
-				fmt.Sprintf("Email %s already in use.", u.Email),
-			)
-		}
-		return errors.NewInternalServerError(err.Error())
+		return errors.ParsePostgresError(err)
 	}
 
 	u.Id = id

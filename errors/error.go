@@ -1,6 +1,15 @@
 package errors
 
-import "net/http"
+import (
+	"fmt"
+	"github.com/lib/pq"
+	"net/http"
+	"strings"
+)
+
+const (
+	errorNoRows = "no rows in result set"
+)
 
 type RestErr struct {
 	Message string `json:"message"`
@@ -30,4 +39,26 @@ func NewInternalServerError(message string) *RestErr {
 		Status:  http.StatusInternalServerError,
 		Error:   http.StatusText(http.StatusInternalServerError),
 	}
+}
+
+
+func ParsePostgresError(err error) *RestErr {
+	pgErr, ok := err.(*pq.Error) // error converted into postgres error
+	if !ok {
+		if strings.Contains(err.Error(), errorNoRows) {
+			return NewNotFoundError("No record matching the given id")
+		}
+		return NewInternalServerError(
+			fmt.Sprintf("Error when parsing database: %s", err.Error()),
+		)
+	}
+
+	switch pgErr.Code {
+	case "23505":
+		return NewInternalServerError(
+			fmt.Sprintf("Error when saving: %s value already in use", pgErr.Constraint),
+		)
+	}
+
+	return NewInternalServerError("Error processing request")
 }
