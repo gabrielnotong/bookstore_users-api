@@ -19,12 +19,16 @@ var (
 func (u *User) Find() *errors.RestErr {
 	row := DB.QueryRow("SELECT * FROM users WHERE id = $1", u.Id)
 	if row == nil {
-		return errors.NewNotFoundError("user not found")
+		return errors.NewNotFoundError(
+			fmt.Sprintf("user %d not found", u.Id),
+		)
 	}
 
 	err := row.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Email, &u.CreatedAt)
 	if err != nil {
-		return errors.NewInternalServerError(err.Error())
+		return errors.NewInternalServerError(
+			fmt.Sprintf("Error when getting a user %d: %s", u.Id, err.Error()),
+		)
 	}
 
 	return nil

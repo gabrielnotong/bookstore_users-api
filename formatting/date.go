@@ -8,6 +8,6 @@ func DateNow() time.Time {
 	return time.Now().UTC()
 }
 
-func DateNowString() string{
+func DateNowString() string {
 	return DateNow().Format(dateLayout)
 }

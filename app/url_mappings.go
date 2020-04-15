@@ -5,7 +5,7 @@ import (
 	"github.com/gabrielnotong/bookstore_users-api/controllers/users"
 )
 
-func mapUrls()  {
+func mapUrls() {
 	router.GET("/ping", handler_ping.Pong)
 
 	router.GET("/users/:id", handler_users.Search)
