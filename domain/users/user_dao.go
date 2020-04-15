@@ -1,9 +1,15 @@
 package users
 
 import (
+	"fmt"
 	"github.com/gabrielnotong/bookstore_users-api/datasource/mysql/users_db"
 	"github.com/gabrielnotong/bookstore_users-api/errors"
 	"github.com/gabrielnotong/bookstore_users-api/formatting"
+	"strings"
+)
+
+const (
+	indexUniqueEmail = "email_unique"
 )
 
 var (
@@ -36,6 +42,11 @@ func (u *User) Save() *errors.RestErr {
 
 	err := DB.QueryRow(sqlStatement, u.FirstName, u.LastName, u.Email, u.CreatedAt).Scan(&id)
 	if err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), indexUniqueEmail) {
+			return errors.NewBadRequestError(
+				fmt.Sprintf("Email %s already in use.", u.Email),
+			)
+		}
 		return errors.NewInternalServerError(err.Error())
 	}
 
