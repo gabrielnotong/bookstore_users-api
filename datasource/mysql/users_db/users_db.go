@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	dbUsername = "db_username"
-	dbPassword = "db_password"
-	dbHost     = "db_host"
-	dbSchema   = "db_schema"
-	dbDriver   = "db_driver"
+	dbUsername = "dbUsername"
+	dbPassword = "dbPassword"
+	dbHost     = "dbHost"
+	dbSchema   = "dbSchema"
+	dbDriver   = "dbDriver"
 )
 
 var (
