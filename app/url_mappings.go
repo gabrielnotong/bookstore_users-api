@@ -10,4 +10,5 @@ func mapUrls() {
 
 	router.GET("/users/:id", handler_users.Search)
 	router.POST("/users", handler_users.Create)
+	router.PUT("/users/:id", handler_users.Update)
 }

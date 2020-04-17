@@ -25,3 +25,25 @@ func FindUser(id int64) (*users.User, *errors.RestErr) {
 
 	return u, nil
 }
+
+func UpdateUser(u *users.User) (*users.User, *errors.RestErr) {
+	cu, err := FindUser(u.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := users.NewValidator().Validate(u); err != nil {
+		return nil, err
+	}
+
+	cu.FirstName = u.FirstName
+	cu.LastName = u.LastName
+	cu.Email = u.Email
+
+	if err := cu.Update(); err != nil {
+		return nil, err
+	}
+
+
+	return cu, nil
+}

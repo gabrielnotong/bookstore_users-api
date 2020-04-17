@@ -9,6 +9,12 @@ import (
 	"strconv"
 )
 
+const (
+	// strconv.ParseInt parameters
+	base10 = 10
+	bit64 = 64
+)
+
 func Create(c *gin.Context) {
 	var u users.User
 
@@ -28,7 +34,7 @@ func Create(c *gin.Context) {
 }
 
 func Search(c *gin.Context) {
-	userId, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	userId, err := strconv.ParseInt(c.Param("id"), base10, bit64)
 	if err != nil {
 		restErr := errors.NewBadRequestError("User id should be a number")
 		c.JSON(restErr.Status, restErr)
@@ -42,4 +48,30 @@ func Search(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func Update(c * gin.Context) {
+	var u users.User
+
+	userId, err := strconv.ParseInt(c.Param("id"), base10, bit64)
+	if err != nil {
+		restErr := errors.NewBadRequestError("User id should be a number")
+		c.JSON(restErr.Status, restErr)
+		return
+	}
+
+	if err = c.ShouldBindJSON(&u); err != nil {
+		restErr := errors.NewBadRequestError("Invalid Json Body")
+		c.JSON(restErr.Status, restErr)
+		return
+	}
+
+	u.Id = userId
+	cu, updateErr := services.UpdateUser(&u)
+	if updateErr != nil {
+		c.JSON(updateErr.Status, updateErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, cu)
 }

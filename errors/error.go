@@ -60,5 +60,7 @@ func ParsePostgresError(err error) *RestErr {
 		)
 	}
 
-	return NewInternalServerError("Error processing request")
+	return NewInternalServerError(
+		fmt.Sprintf("Error processing request: %s", err.Error()),
+	)
 }

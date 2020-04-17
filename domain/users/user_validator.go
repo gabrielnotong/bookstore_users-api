@@ -14,7 +14,7 @@ func NewValidator() *Validator {
 }
 
 func (v *Validator) Validate(u *User) *errors.RestErr {
-	err := v.v2.StructExcept(u)
+	err := v.v2.StructExcept(u, "Id", "CreatedAt")
 	if err != nil {
 		return errors.NewBadRequestError(err.Error())
 	}
