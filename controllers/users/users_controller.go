@@ -12,7 +12,7 @@ import (
 const (
 	// strconv.ParseInt parameters
 	base10 = 10
-	bit64 = 64
+	bit64  = 64
 )
 
 func getUserId(userIdParam string) (int64, *errors.RestErr) {
@@ -40,7 +40,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user.Marshall(c.GetHeader("X-Public") == "true"))
 }
 
 func FindUser(c *gin.Context) {
@@ -56,10 +56,10 @@ func FindUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user.Marshall(c.GetHeader("X-Public") == "true"))
 }
 
-func Update(c * gin.Context) {
+func Update(c *gin.Context) {
 	var u users.User
 
 	userId, idErr := getUserId(c.Param("id"))
@@ -81,7 +81,7 @@ func Update(c * gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, cu)
+	c.JSON(http.StatusOK, cu.Marshall(c.GetHeader("X-Public") == "true"))
 }
 
 func Delete(c *gin.Context) {
@@ -96,7 +96,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]string{"status":"deleted"})
+	c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
 
 func Search(c *gin.Context) {
@@ -107,5 +107,5 @@ func Search(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, uu)
+	c.JSON(http.StatusOK, uu.Marshall(c.GetHeader("X-Public") == "true"))
 }

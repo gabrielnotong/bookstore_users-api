@@ -13,3 +13,5 @@ type User struct {
 	Status    string `json:"status"`
 	Password  string `json:"password" validate:"required"`
 }
+
+type Users []*User

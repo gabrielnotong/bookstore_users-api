@@ -13,6 +13,7 @@ func CreateUser(u users.User) (*users.User, *errors.RestErr) {
 
 	u.Status = users.StatusActive
 	u.CreatedAt = formatting.DateNowString()
+	u.Password = formatting.Sha256(u.Password)
 	if err := u.Save(); err != nil {
 		return nil, err
 	}
@@ -55,7 +56,7 @@ func DeleteUser(id int64) *errors.RestErr {
 	return cu.Delete()
 }
 
-func Search(status string) ([]*users.User, *errors.RestErr) {
+func Search(status string) (users.Users, *errors.RestErr) {
 	dao := &users.User{}
 	return dao.FindByStatus(status)
 }

@@ -41,7 +41,6 @@ func NewInternalServerError(message string) *RestErr {
 	}
 }
 
-
 func ParsePostgresError(err error) *RestErr {
 	pgErr, ok := err.(*pq.Error) // error converted into postgres error
 	if !ok {

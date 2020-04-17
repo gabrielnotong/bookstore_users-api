@@ -11,10 +11,10 @@ var (
 )
 
 const (
-	queryInsertUser = "INSERT INTO users (first_name, last_name, email, status, password, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
-	querySelectUser = "SELECT id, first_name, last_name, email, status, created_at FROM users WHERE id = $1"
-	queryUpdateUser = "UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1"
-	queryDeleteUser = "DELETE FROM users WHERE id=$1"
+	queryInsertUser   = "INSERT INTO users (first_name, last_name, email, status, password, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
+	querySelectUser   = "SELECT id, first_name, last_name, email, status, created_at FROM users WHERE id = $1"
+	queryUpdateUser   = "UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1"
+	queryDeleteUser   = "DELETE FROM users WHERE id=$1"
 	queryFindByStatus = "SELECT id, first_name, last_name, email, created_at, status FROM users WHERE status=$1"
 )
 
