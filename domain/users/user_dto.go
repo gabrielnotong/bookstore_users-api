@@ -6,4 +6,6 @@ type User struct {
 	LastName  string `json:"last_name" validate:"required"`
 	Email     string `json:"email" validate:"required"`
 	CreatedAt string `json:"created_at" validate:"required"`
+	Status    string `json:"status"`
+	Password  string `json:"-"`
 }

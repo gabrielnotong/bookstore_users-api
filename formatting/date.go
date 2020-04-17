@@ -2,7 +2,7 @@ package formatting
 
 import "time"
 
-const dateLayout = "2006-01-02T15:03:05Z"
+const dateLayout = "2006-01-02 15:03:05"
 
 func DateNow() time.Time {
 	return time.Now().UTC()

@@ -43,7 +43,7 @@ func Create(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func Search(c *gin.Context) {
+func FindUser(c *gin.Context) {
 	userId, idErr := getUserId(c.Param("id"))
 	if idErr != nil {
 		c.JSON(idErr.Status, idErr)
@@ -97,4 +97,15 @@ func Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]string{"status":"deleted"})
+}
+
+func Search(c *gin.Context) {
+	status := c.Query("status")
+	uu, findErr := services.Search(status)
+	if findErr != nil {
+		c.JSON(findErr.Status, findErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, uu)
 }
