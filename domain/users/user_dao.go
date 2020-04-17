@@ -11,11 +11,10 @@ var (
 )
 
 const (
-	queryInsertUser = ` INSERT INTO users (first_name, last_name, email, created_at)
-						VALUES ($1, $2, $3, $4)
-						RETURNING id`
-	querySelectUser = `SELECT * FROM users WHERE id = $1`
-	queryUpdateUser = `UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1`
+	queryInsertUser = "INSERT INTO users (first_name, last_name, email, created_at) VALUES ($1, $2, $3, $4) RETURNING id"
+	querySelectUser = "SELECT * FROM users WHERE id = $1"
+	queryUpdateUser = "UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1"
+	queryDeleteUser = "DELETE FROM users WHERE id=$1"
 )
 
 func (u *User) Find() *errors.RestErr {
@@ -58,6 +57,20 @@ func (u *User) Update() *errors.RestErr {
 
 	_, err = stmt.Exec(u.Id, u.FirstName, u.LastName, u.Email)
 	if err != nil {
+		return errors.ParsePostgresError(err)
+	}
+
+	return nil
+}
+
+func (u *User) Delete() *errors.RestErr {
+	stmt, err := DB.Prepare(queryDeleteUser)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
+	}
+	defer stmt.Close()
+
+	if _, err = stmt.Exec(u.Id); err != nil {
 		return errors.ParsePostgresError(err)
 	}
 

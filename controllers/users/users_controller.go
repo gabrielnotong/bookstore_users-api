@@ -15,6 +15,16 @@ const (
 	bit64 = 64
 )
 
+func getUserId(userIdParam string) (int64, *errors.RestErr) {
+	userId, err := strconv.ParseInt(userIdParam, base10, bit64)
+	if err != nil {
+		restErr := errors.NewBadRequestError("User id should be a number")
+		return 0, restErr
+	}
+
+	return userId, nil
+}
+
 func Create(c *gin.Context) {
 	var u users.User
 
@@ -34,10 +44,9 @@ func Create(c *gin.Context) {
 }
 
 func Search(c *gin.Context) {
-	userId, err := strconv.ParseInt(c.Param("id"), base10, bit64)
-	if err != nil {
-		restErr := errors.NewBadRequestError("User id should be a number")
-		c.JSON(restErr.Status, restErr)
+	userId, idErr := getUserId(c.Param("id"))
+	if idErr != nil {
+		c.JSON(idErr.Status, idErr)
 		return
 	}
 
@@ -53,14 +62,13 @@ func Search(c *gin.Context) {
 func Update(c * gin.Context) {
 	var u users.User
 
-	userId, err := strconv.ParseInt(c.Param("id"), base10, bit64)
-	if err != nil {
-		restErr := errors.NewBadRequestError("User id should be a number")
-		c.JSON(restErr.Status, restErr)
+	userId, idErr := getUserId(c.Param("id"))
+	if idErr != nil {
+		c.JSON(idErr.Status, idErr)
 		return
 	}
 
-	if err = c.ShouldBindJSON(&u); err != nil {
+	if err := c.ShouldBindJSON(&u); err != nil {
 		restErr := errors.NewBadRequestError("Invalid Json Body")
 		c.JSON(restErr.Status, restErr)
 		return
@@ -74,4 +82,19 @@ func Update(c * gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, cu)
+}
+
+func Delete(c *gin.Context) {
+	userId, idErr := getUserId(c.Param("id"))
+	if idErr != nil {
+		c.JSON(idErr.Status, idErr)
+		return
+	}
+
+	if delErr := services.DeleteUser(userId); delErr != nil {
+		c.JSON(delErr.Status, delErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]string{"status":"deleted"})
 }
