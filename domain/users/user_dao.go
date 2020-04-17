@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gabrielnotong/bookstore_users-api/datasource/mysql/users_db"
 	"github.com/gabrielnotong/bookstore_users-api/errors"
-	"github.com/gabrielnotong/bookstore_users-api/formatting"
 )
 
 var (
@@ -13,7 +12,7 @@ var (
 
 const (
 	queryInsertUser = "INSERT INTO users (first_name, last_name, email, status, password, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
-	querySelectUser = "SELECT * FROM users WHERE id = $1"
+	querySelectUser = "SELECT id, first_name, last_name, email, status, created_at FROM users WHERE id = $1"
 	queryUpdateUser = "UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1"
 	queryDeleteUser = "DELETE FROM users WHERE id=$1"
 	queryFindByStatus = "SELECT id, first_name, last_name, email, created_at, status FROM users WHERE status=$1"
@@ -28,7 +27,7 @@ func (u *User) Find() *errors.RestErr {
 
 	res := stmt.QueryRow(u.Id)
 
-	err = res.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Email, &u.CreatedAt)
+	err = res.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Email, &u.Status, &u.CreatedAt)
 	if err != nil {
 		return errors.ParsePostgresError(err)
 	}
@@ -39,7 +38,6 @@ func (u *User) Find() *errors.RestErr {
 func (u *User) Save() *errors.RestErr {
 	var id int64
 
-	u.CreatedAt = formatting.DateNowString()
 	err := DB.QueryRow(
 		queryInsertUser,
 		u.FirstName,

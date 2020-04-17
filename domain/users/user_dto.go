@@ -1,5 +1,9 @@
 package users
 
+const (
+	StatusActive = "active"
+)
+
 type User struct {
 	Id        int64  `json:"id" validate:"required"`
 	FirstName string `json:"first_name" validate:"required"`
@@ -7,5 +11,5 @@ type User struct {
 	Email     string `json:"email" validate:"required"`
 	CreatedAt string `json:"created_at" validate:"required"`
 	Status    string `json:"status"`
-	Password  string `json:"-"`
+	Password  string `json:"password" validate:"required"`
 }

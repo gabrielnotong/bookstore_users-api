@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/gabrielnotong/bookstore_users-api/domain/users"
 	"github.com/gabrielnotong/bookstore_users-api/errors"
+	"github.com/gabrielnotong/bookstore_users-api/formatting"
 )
 
 func CreateUser(u users.User) (*users.User, *errors.RestErr) {
@@ -10,6 +11,8 @@ func CreateUser(u users.User) (*users.User, *errors.RestErr) {
 		return nil, err
 	}
 
+	u.Status = users.StatusActive
+	u.CreatedAt = formatting.DateNowString()
 	if err := u.Save(); err != nil {
 		return nil, err
 	}
