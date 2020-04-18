@@ -6,15 +6,19 @@ import (
 	"strings"
 )
 
-type Validator struct {
+var (
+	Validator validatorInterface = &validator{validator2.New()}
+)
+
+type validator struct {
 	v2 *validator2.Validate
 }
 
-func NewValidator() *Validator {
-	return &Validator{validator2.New()}
+type validatorInterface interface {
+	Validate(*User) *errors.RestErr
 }
 
-func (v *Validator) Validate(u *User) *errors.RestErr {
+func (v *validator) Validate(u *User) *errors.RestErr {
 	err := v.v2.StructExcept(u, "Id", "CreatedAt")
 	if err != nil {
 		return errors.NewBadRequestError(formatErrorMsg(err))

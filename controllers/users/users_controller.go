@@ -34,7 +34,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	user, restErr := services.CreateUser(u)
+	user, restErr := services.UsersService.CreateUser(u)
 	if restErr != nil {
 		c.JSON(restErr.Status, restErr)
 		return
@@ -50,7 +50,7 @@ func FindUser(c *gin.Context) {
 		return
 	}
 
-	user, restErr := services.FindUser(userId)
+	user, restErr := services.UsersService.FindUser(userId)
 	if restErr != nil {
 		c.JSON(restErr.Status, restErr)
 		return
@@ -75,7 +75,7 @@ func Update(c *gin.Context) {
 	}
 
 	u.Id = userId
-	cu, updateErr := services.UpdateUser(&u)
+	cu, updateErr := services.UsersService.UpdateUser(&u)
 	if updateErr != nil {
 		c.JSON(updateErr.Status, updateErr)
 		return
@@ -91,7 +91,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	if delErr := services.DeleteUser(userId); delErr != nil {
+	if delErr := services.UsersService.DeleteUser(userId); delErr != nil {
 		c.JSON(delErr.Status, delErr)
 		return
 	}
@@ -101,7 +101,7 @@ func Delete(c *gin.Context) {
 
 func Search(c *gin.Context) {
 	status := c.Query("status")
-	uu, findErr := services.Search(status)
+	uu, findErr := services.UsersService.Search(status)
 	if findErr != nil {
 		c.JSON(findErr.Status, findErr)
 		return
