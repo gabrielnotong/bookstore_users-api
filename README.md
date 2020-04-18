@@ -2,8 +2,12 @@
 
 ### Best parts
 
-- Video 17: Fixing mistakes we made
+#### Fixing mistakes we made
+
+- Video 17: 
 > how to marshall structs (the yellow mark)
+- Video 18: 
+- Video 19: 
 
 # Modules and Sum
 
