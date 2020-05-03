@@ -32,6 +32,7 @@ func init() {
 		"%s://%s:%s@%s/%s?sslmode=disable",
 		driver, username, password, host, schema,
 	)
+
 	DB, err = sql.Open(driver, dataSourceName)
 	if err != nil {
 		panic(err)

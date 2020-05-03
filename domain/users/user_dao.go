@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gabrielnotong/bookstore_users-api/datasource/mysql/users_db"
 	"github.com/gabrielnotong/bookstore_users-api/errors"
+	"github.com/gabrielnotong/bookstore_users-api/formatting"
 	"github.com/gabrielnotong/bookstore_users-api/logger"
 )
 
@@ -12,11 +13,12 @@ var (
 )
 
 const (
-	queryInsertUser   = "INSERT INTO users (first_name, last_name, email, status, password, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
-	querySelectUser   = "SELECT id, first_name, last_name, email, status, created_at FROM users WHERE id = $1"
-	queryUpdateUser   = "UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1"
-	queryDeleteUser   = "DELETE FROM users WHERE id=$1"
-	queryFindByStatus = "SELECT id, first_name, last_name, email, created_at, status FROM users WHERE status=$1"
+	queryInsertUser             = "INSERT INTO users (first_name, last_name, email, status, password, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
+	querySelectUser             = "SELECT id, first_name, last_name, email, status, created_at FROM users WHERE id = $1"
+	queryUpdateUser             = "UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1"
+	queryDeleteUser             = "DELETE FROM users WHERE id=$1"
+	queryFindByStatus           = "SELECT id, first_name, last_name, email, created_at, status FROM users WHERE status=$1"
+	queryFindByEmailAndPassword = "SELECT id, first_name, last_name, email, created_at, status FROM users WHERE email=$1 AND password=$2"
 )
 
 func (u *User) Find() *errors.RestErr {
@@ -125,4 +127,18 @@ func (u *User) FindByStatus(status string) ([]*User, *errors.RestErr) {
 	}
 
 	return uu, nil
+}
+
+func (u *User) FindByEmailAndPassword() (*User, *errors.RestErr) {
+	stm, err := DB.Prepare(queryFindByEmailAndPassword)
+	if err != nil {
+		return nil, errors.NewInternalServerError(err.Error())
+	}
+	defer stm.Close()
+
+	row := stm.QueryRow(u.Email, formatting.Sha256(u.Password))
+	if err = row.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Email, &u.CreatedAt, &u.Status); err != nil {
+		return nil, errors.NewInternalServerError(err.Error())
+	}
+	return u, nil
 }

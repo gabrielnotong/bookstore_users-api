@@ -109,3 +109,16 @@ func Search(c *gin.Context) {
 
 	c.JSON(http.StatusOK, uu.Marshall(c.GetHeader("X-Public") == "true"))
 }
+
+func SearchByEmailAndPassword(c *gin.Context) {
+	email := c.Query("email")
+	password := c.Query("password")
+
+	u, err := services.UsersService.SearchByEmailAndPassword(email, password)
+	if err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, u.Marshall(c.GetHeader("X-Public") == "true"))
+}

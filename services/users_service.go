@@ -9,15 +9,17 @@ import (
 var (
 	UsersService usersServiceInterface = &usersService{}
 )
+
 type usersServiceInterface interface {
 	CreateUser(users.User) (*users.User, *errors.RestErr)
 	FindUser(int64) (*users.User, *errors.RestErr)
 	UpdateUser(*users.User) (*users.User, *errors.RestErr)
 	DeleteUser(int64) *errors.RestErr
 	Search(string) (users.Users, *errors.RestErr)
+	SearchByEmailAndPassword(string, string) (*users.User, *errors.RestErr)
 }
 
-type usersService struct {}
+type usersService struct{}
 
 func (us *usersService) CreateUser(u users.User) (*users.User, *errors.RestErr) {
 	if err := users.Validator.Validate(&u); err != nil {
@@ -72,4 +74,9 @@ func (us *usersService) DeleteUser(id int64) *errors.RestErr {
 func (us *usersService) Search(status string) (users.Users, *errors.RestErr) {
 	dao := &users.User{}
 	return dao.FindByStatus(status)
+}
+
+func (us *usersService) SearchByEmailAndPassword(email string, password string) (*users.User, *errors.RestErr) {
+	dao := &users.User{Email: email, Password: password}
+	return dao.FindByEmailAndPassword()
 }
