@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gabrielnotong/bookstore_users-api/datasource/mysql/users_db"
 	"github.com/gabrielnotong/bookstore_users-api/errors"
-	"github.com/gabrielnotong/bookstore_users-api/formatting"
 	"github.com/gabrielnotong/bookstore_users-api/logger"
+	"strings"
 )
 
 var (
@@ -18,7 +18,7 @@ const (
 	queryUpdateUser             = "UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1"
 	queryDeleteUser             = "DELETE FROM users WHERE id=$1"
 	queryFindByStatus           = "SELECT id, first_name, last_name, email, created_at, status FROM users WHERE status=$1"
-	queryFindByEmailAndPassword = "SELECT id, first_name, last_name, email, created_at, status FROM users WHERE email=$1 AND password=$2"
+	queryFindByEmailAndPassword = "SELECT id, first_name, last_name, email, created_at, status FROM users WHERE email=$1 AND password=$2 AND status=$3"
 )
 
 func (u *User) Find() *errors.RestErr {
@@ -136,8 +136,11 @@ func (u *User) FindByEmailAndPassword() (*User, *errors.RestErr) {
 	}
 	defer stm.Close()
 
-	row := stm.QueryRow(u.Email, formatting.Sha256(u.Password))
+	row := stm.QueryRow(u.Email, u.Password, StatusActive)
 	if err = row.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Email, &u.CreatedAt, &u.Status); err != nil {
+		if strings.Contains(err.Error(), errors.ErrorNoRows) {
+			return nil, errors.NewNotFoundError("Invalid user credentials")
+		}
 		return nil, errors.NewInternalServerError(err.Error())
 	}
 	return u, nil

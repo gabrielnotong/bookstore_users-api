@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	errorNoRows = "no rows in result set"
+	ErrorNoRows = "no rows in result set"
 )
 
 type RestErr struct {
@@ -44,7 +44,7 @@ func NewInternalServerError(message string) *RestErr {
 func ParsePostgresError(err error) *RestErr {
 	pgErr, ok := err.(*pq.Error) // error converted into postgres error
 	if !ok {
-		if strings.Contains(err.Error(), errorNoRows) {
+		if strings.Contains(err.Error(), ErrorNoRows) {
 			return NewNotFoundError("No record matching the given id")
 		}
 		return NewInternalServerError(

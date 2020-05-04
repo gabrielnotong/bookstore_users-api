@@ -16,7 +16,7 @@ type usersServiceInterface interface {
 	UpdateUser(*users.User) (*users.User, *errors.RestErr)
 	DeleteUser(int64) *errors.RestErr
 	Search(string) (users.Users, *errors.RestErr)
-	SearchByEmailAndPassword(string, string) (*users.User, *errors.RestErr)
+	Login(users.LoginRequest) (*users.User, *errors.RestErr)
 }
 
 type usersService struct{}
@@ -76,7 +76,7 @@ func (us *usersService) Search(status string) (users.Users, *errors.RestErr) {
 	return dao.FindByStatus(status)
 }
 
-func (us *usersService) SearchByEmailAndPassword(email string, password string) (*users.User, *errors.RestErr) {
-	dao := &users.User{Email: email, Password: password}
+func (us *usersService) Login(u users.LoginRequest) (*users.User, *errors.RestErr) {
+	dao := &users.User{Email: u.Email, Password: formatting.Sha256(u.Password)}
 	return dao.FindByEmailAndPassword()
 }
